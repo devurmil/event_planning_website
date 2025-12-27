@@ -2,9 +2,18 @@ import { useState } from "react";
 import { useQuery } from "convex/react";
 import { Link } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
+import BookingModal from "../components/BookingModal";
 
 export default function EventsPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [selectedEventName, setSelectedEventName] = useState("");
+
+  const handleBookNow = (eventName: string) => {
+    setSelectedEventName(eventName);
+    setIsBookingModalOpen(true);
+  };
+
   const allEvents = useQuery(api.events.getAllEvents) || [];
 
   const categories = [
@@ -16,8 +25,8 @@ export default function EventsPage() {
     { id: "anniversary", name: "Anniversaries" },
   ];
 
-  const filteredEvents = selectedCategory === "all" 
-    ? allEvents 
+  const filteredEvents = selectedCategory === "all"
+    ? allEvents
     : allEvents.filter(event => event.category === selectedCategory);
 
   // Example events data for display
@@ -78,9 +87,9 @@ export default function EventsPage() {
     }
   ];
 
-  const displayEvents = filteredEvents.length > 0 ? filteredEvents : 
-    (selectedCategory === "all" ? exampleEvents : 
-     exampleEvents.filter(event => event.category === selectedCategory));
+  const displayEvents = filteredEvents.length > 0 ? filteredEvents :
+    (selectedCategory === "all" ? exampleEvents :
+      exampleEvents.filter(event => event.category === selectedCategory));
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -99,11 +108,10 @@ export default function EventsPage() {
             <button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
-              className={`px-6 py-3 rounded-full font-medium transition-colors ${
-                selectedCategory === category.id
-                  ? "bg-purple-600 text-white"
-                  : "bg-white text-gray-700 hover:bg-purple-50 border border-gray-200"
-              }`}
+              className={`px-6 py-3 rounded-full font-medium transition-colors ${selectedCategory === category.id
+                ? "bg-purple-600 text-white"
+                : "bg-white text-gray-700 hover:bg-purple-50 border border-gray-200"
+                }`}
             >
               {category.name}
             </button>
@@ -132,7 +140,7 @@ export default function EventsPage() {
                 <p className="text-gray-600 mb-4 line-clamp-2">
                   {'shortDescription' in event ? event.shortDescription : event.description}
                 </p>
-                
+
                 {/* Features */}
                 <div className="mb-4">
                   <h4 className="font-medium text-gray-900 mb-2">Included:</h4>
@@ -155,12 +163,12 @@ export default function EventsPage() {
                   >
                     View Details
                   </Link>
-                  <Link
-                    to="/contact"
+                  <button
+                    onClick={() => handleBookNow('title' in event ? event.title : 'Event')}
                     className="flex-1 border border-purple-600 text-purple-600 text-center py-2 px-4 rounded hover:bg-purple-50 transition-colors"
                   >
                     Book Now
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>
@@ -189,6 +197,12 @@ export default function EventsPage() {
           </Link>
         </div>
       </div>
+
+      <BookingModal
+        isOpen={isBookingModalOpen}
+        onClose={() => setIsBookingModalOpen(false)}
+        eventName={selectedEventName}
+      />
     </div>
   );
 }
