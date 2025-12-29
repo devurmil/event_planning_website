@@ -8,31 +8,24 @@ export default function AboutPage() {
   const exampleTeam = [
     {
       id: 1,
-      name: "Sarah Johnson",
+      name: "Urmil Ramani",
       position: "Founder & Lead Planner",
       image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=300",
-      bio: "With over 15 years of experience in event planning, Sarah founded EventPro with a vision to create unforgettable experiences. She specializes in luxury weddings and corporate events."
+      bio: "With over 15 years of experience in event planning, Urmil founded EventPro with a vision to create unforgettable experiences. She specializes in luxury weddings and corporate events."
     },
     {
       id: 2,
-      name: "Michael Chen",
+      name: "Aryan Dhandhukiya",
       position: "Creative Director",
       image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300",
-      bio: "Michael brings artistic vision to every event with his background in interior design and visual arts. He leads our decoration and design team with creativity and precision."
+      bio: "Aryan brings artistic vision to every event with his background in interior design and visual arts. He leads our decoration and design team with creativity and precision."
     },
     {
       id: 3,
-      name: "Emily Rodriguez",
-      position: "Operations Manager",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300",
-      bio: "Emily ensures every event runs smoothly with her exceptional organizational skills and attention to detail. She coordinates logistics and vendor relationships."
-    },
-    {
-      id: 4,
-      name: "David Thompson",
+      name: "Vraj Patel",
       position: "Technical Coordinator",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300",
-      bio: "David handles all technical aspects including sound, lighting, and AV equipment. His expertise ensures flawless technical execution for every event."
+      bio: "Vraj handles all technical aspects including sound, lighting, and AV equipment. His expertise ensures flawless technical execution for every event."
     }
   ];
 
@@ -41,7 +34,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-20">
+      <section className="bg-gradient-to-r from-purple-600 pt-[7rem] to-pink-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold mb-6">About EventPro</h1>
           <p className="text-xl max-w-3xl mx-auto">
@@ -187,7 +180,7 @@ export default function AboutPage() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="flex flex-col mx-auto md:flex-row lg:flex-row gap-8">
             {displayTeam.map((member) => (
               <div key={'id' in member ? member.id : member._id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                 <img

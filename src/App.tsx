@@ -16,7 +16,7 @@ import { SignInForm } from "./SignInForm";
 export default function App() {
   return (
     <Router>
-      <div className="min-h-screen flex flex-col bg-gray-50">
+      <div className="min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-1">
           <Routes>
@@ -28,9 +28,9 @@ export default function App() {
             <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/admin" element={
-              // <Authenticated>
+              <Authenticated>
                 <AdminDashboard />
-              // </Authenticated>
+              </Authenticated>
             } />
             <Route path="/login" element={
               <Unauthenticated>

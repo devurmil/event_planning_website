@@ -7,10 +7,10 @@ export default function HomePage() {
   const testimonials = useQuery(api.events.getTestimonials) || [];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-purple-600 to-pink-600 text-white py-20">
-        <div className="absolute inset-0 bg-black opacity-20"></div>
+      <section className="relative bg-gradient-to-r from-purple-600 to-pink-600 pt-[7rem] text-white py-20">
+        <div className="bg-black opacity-20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
             We Plan. You Celebrate.
@@ -37,7 +37,7 @@ export default function HomePage() {
       </section>
 
       {/* Services Overview */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Services</h2>
@@ -63,7 +63,7 @@ export default function HomePage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose EventPro?</h2>
@@ -101,7 +101,7 @@ export default function HomePage() {
       </section>
 
       {/* Featured Events */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Featured Events</h2>
@@ -187,7 +187,7 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">What Our Clients Say</h2>

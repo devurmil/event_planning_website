@@ -37,7 +37,6 @@ export default function EventsPage() {
       category: "wedding",
       image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=400",
       description: "Beautiful outdoor wedding ceremony with floral arrangements and elegant decor",
-      price: 2500,
       features: ["Venue decoration", "Floral arrangements", "Photography", "Catering coordination"]
     },
     {
@@ -46,16 +45,14 @@ export default function EventsPage() {
       category: "corporate",
       image: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=400",
       description: "Professional corporate event with networking opportunities and presentations",
-      price: 1800,
       features: ["AV equipment", "Stage setup", "Networking area", "Professional lighting"]
     },
     {
       id: 3,
-      title: "Kids Birthday Party",
+      title: "Kids/Adults Birthday Party",
       category: "birthday",
       image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=400",
       description: "Fun-filled birthday celebration with games, entertainment, and themed decorations",
-      price: 800,
       features: ["Themed decorations", "Entertainment", "Party games", "Birthday cake"]
     },
     {
@@ -64,7 +61,6 @@ export default function EventsPage() {
       category: "concert",
       image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400",
       description: "Intimate concert venue setup with professional sound and lighting systems",
-      price: 3000,
       features: ["Sound system", "Stage lighting", "Security", "Ticket management"]
     },
     {
@@ -73,7 +69,6 @@ export default function EventsPage() {
       category: "anniversary",
       image: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=400",
       description: "Elegant anniversary celebration with personalized touches and memorable moments",
-      price: 1200,
       features: ["Elegant decor", "Memory displays", "Special dining", "Photography"]
     },
     {
@@ -82,7 +77,6 @@ export default function EventsPage() {
       category: "corporate",
       image: "https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=400",
       description: "Modern product launch with interactive displays and media coverage",
-      price: 2200,
       features: ["Product displays", "Media setup", "Presentation area", "Refreshments"]
     }
   ];
@@ -92,7 +86,7 @@ export default function EventsPage() {
       exampleEvents.filter(event => event.category === selectedCategory));
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 pt-[5rem]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -131,9 +125,6 @@ export default function EventsPage() {
                 <div className="flex items-center justify-between mb-2">
                   <span className="bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full capitalize">
                     {event.category}
-                  </span>
-                  <span className="text-purple-600 font-bold text-lg">
-                    ${'price' in event ? event.price : event.pricing.basic}
                   </span>
                 </div>
                 <h3 className="text-xl font-semibold mb-3">{event.title}</h3>

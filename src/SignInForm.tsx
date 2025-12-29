@@ -9,7 +9,7 @@ export function SignInForm() {
   const [submitting, setSubmitting] = useState(false);
 
   return (
-    <div className="w-full">
+    <div className="w-full border border-gray-200 p-6 rounded-lg">
       <form
         className="flex flex-col gap-form-field"
         onSubmit={(e) => {
