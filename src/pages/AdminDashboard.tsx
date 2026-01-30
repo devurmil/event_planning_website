@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { useQuery } from "@/hooks/use-local-convex";
+import { localApi as api } from "@/lib/db";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");

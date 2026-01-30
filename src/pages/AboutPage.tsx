@@ -1,8 +1,9 @@
-import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { useQuery } from "@/hooks/use-local-convex";
+import { localApi as api } from "@/lib/db";
+import { TeamMember } from "@/lib/types";
 
 export default function AboutPage() {
-  const team = useQuery(api.events.getTeam) || [];
+  const team = useQuery<TeamMember[]>(api.events.getTeam) || [];
 
   // Example team data
   const exampleTeam = [

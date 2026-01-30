@@ -1,77 +1,62 @@
 "use client";
-import { useAuthActions } from "@convex-dev/auth/react";
+import { useAuth } from "@/lib/auth";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export function SignInForm() {
-  const { signIn } = useAuthActions();
-  const [flow, setFlow] = useState<"signIn" | "signUp">("signIn");
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
 
   return (
-    <div className="w-full border border-gray-200 p-6 rounded-lg">
+    <div className="w-full border border-gray-200 p-6 rounded-lg bg-white shadow-sm">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">Sign In</h2>
+        <p className="text-gray-600">Enter your credentials to access the admin panel</p>
+      </div>
       <form
-        className="flex flex-col gap-form-field"
+        className="flex flex-col gap-4"
         onSubmit={(e) => {
           e.preventDefault();
           setSubmitting(true);
-          const formData = new FormData(e.target as HTMLFormElement);
-          formData.set("flow", flow);
-          void signIn("password", formData).catch((error) => {
-            let toastTitle = "";
-            if (error.message.includes("Invalid password")) {
-              toastTitle = "Invalid password. Please try again.";
-            } else {
-              toastTitle =
-                flow === "signIn"
-                  ? "Could not sign in, did you mean to sign up?"
-                  : "Could not sign up, did you mean to sign in?";
-            }
-            toast.error(toastTitle);
+          // Simulate network delay
+          setTimeout(() => {
+            login();
+            toast.success("Signed in successfully");
+            navigate("/admin");
             setSubmitting(false);
-          });
+          }, 500);
         }}
       >
         <input
-          className="auth-input-field"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
           type="email"
           name="email"
-          placeholder="Email"
+          placeholder="Email (any)"
           required
         />
         <input
-          className="auth-input-field"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
           type="password"
           name="password"
-          placeholder="Password"
+          placeholder="Password (any)"
           required
         />
-        <button className="auth-button" type="submit" disabled={submitting}>
-          {flow === "signIn" ? "Sign in" : "Sign up"}
+        <button 
+            className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 transition-colors disabled:opacity-50" 
+            type="submit" 
+            disabled={submitting}
+        >
+          {submitting ? "Signing in..." : "Sign in"}
         </button>
-        <div className="text-center text-sm text-secondary">
-          <span>
-            {flow === "signIn"
-              ? "Don't have an account? "
-              : "Already have an account? "}
-          </span>
-          <button
-            type="button"
-            className="text-primary hover:text-primary-hover hover:underline font-medium cursor-pointer"
-            onClick={() => setFlow(flow === "signIn" ? "signUp" : "signIn")}
-          >
-            {flow === "signIn" ? "Sign up instead" : "Sign in instead"}
-          </button>
-        </div>
       </form>
-      <div className="flex items-center justify-center my-3">
-        <hr className="my-4 grow border-gray-200" />
-        <span className="mx-4 text-secondary">or</span>
-        <hr className="my-4 grow border-gray-200" />
+      <div className="mt-4 text-center">
+        <p className="text-sm text-gray-500">
+           (This is a mock login. Any email/password will work)
+        </p>
       </div>
-      <button className="auth-button" onClick={() => void signIn("anonymous")}>
-        Sign in anonymously
-      </button>
     </div>
   );
 }
+

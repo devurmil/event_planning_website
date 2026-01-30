@@ -1,13 +1,13 @@
-import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Id } from "../../convex/_generated/dataModel";
+import { useState } from "react";
+import { useQuery, useMutation } from "@/hooks/use-local-convex";
+import { localApi as api } from "@/lib/db";
+import { Event } from "@/lib/types";
 
 export default function EventDetailsPage() {
-  const { id } = useParams<{ id: string }>();
-  const event = useQuery(api.events.getEventById, id ? { id: id as Id<"events"> } : "skip");
-  const createBooking = useMutation(api.events.createBooking);
+  const { id } = useParams();
+  const event = useQuery<Event>(api.events.getEventById, { id: id as string });
+  const createBooking = useMutation(api.bookings.create);
   
   const [selectedPackage, setSelectedPackage] = useState("basic");
   const [showBookingForm, setShowBookingForm] = useState(false);

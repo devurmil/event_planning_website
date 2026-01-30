@@ -1,8 +1,9 @@
-import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { useQuery } from "@/hooks/use-local-convex";
+import { localApi as api } from "@/lib/db";
+import { Service } from "@/lib/types";
 
 export default function ServicesPage() {
-  const services = useQuery(api.events.getServices) || [];
+  const services = useQuery<Service[]>(api.events.getServices) || [];
 
   // Example services data
   const exampleServices = [

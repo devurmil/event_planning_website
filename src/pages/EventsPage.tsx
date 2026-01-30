@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useQuery } from "convex/react";
 import { Link } from "react-router-dom";
-import { api } from "../../convex/_generated/api";
+import { useQuery } from "@/hooks/use-local-convex";
+import { localApi as api } from "@/lib/db";
+import { Event } from "@/lib/types";
 import BookingModal from "../components/BookingModal";
 
 export default function EventsPage() {
@@ -14,7 +15,7 @@ export default function EventsPage() {
     setIsBookingModalOpen(true);
   };
 
-  const allEvents = useQuery(api.events.getAllEvents) || [];
+  const allEvents = useQuery<Event[]>(api.events.getAllEvents) || [];
 
   const categories = [
     { id: "all", name: "All Events" },
@@ -27,7 +28,7 @@ export default function EventsPage() {
 
   const filteredEvents = selectedCategory === "all"
     ? allEvents
-    : allEvents.filter(event => event.category === selectedCategory);
+    : allEvents.filter((event: Event) => event.category === selectedCategory);
 
   // Example events data for display
   const exampleEvents = [
@@ -83,7 +84,7 @@ export default function EventsPage() {
 
   const displayEvents = filteredEvents.length > 0 ? filteredEvents :
     (selectedCategory === "all" ? exampleEvents :
-      exampleEvents.filter(event => event.category === selectedCategory));
+      exampleEvents.filter((event: any) => event.category === selectedCategory));
 
   return (
     <div className="min-h-screen bg-gray-50 pt-[5rem]">
@@ -114,7 +115,7 @@ export default function EventsPage() {
 
         {/* Events Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {displayEvents.map((event) => (
+          {displayEvents.map((event: any) => (
             <div key={'id' in event ? event.id : event._id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
               <img
                 src={'image' in event ? event.image : event.imageUrl}
@@ -136,7 +137,7 @@ export default function EventsPage() {
                 <div className="mb-4">
                   <h4 className="font-medium text-gray-900 mb-2">Included:</h4>
                   <ul className="text-sm text-gray-600 space-y-1">
-                    {event.features.slice(0, 3).map((feature, index) => (
+                    {event.features.slice(0, 3).map((feature: string, index: number) => (
                       <li key={index} className="flex items-center">
                         <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

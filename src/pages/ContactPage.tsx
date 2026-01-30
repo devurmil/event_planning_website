@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { useMutation } from "@/hooks/use-local-convex";
+import { localApi as api } from "@/lib/db";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({

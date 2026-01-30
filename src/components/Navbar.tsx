@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Authenticated, Unauthenticated } from "convex/react";
+import { useAuth, Authenticated, Unauthenticated } from "@/lib/auth";
 import { SignOutButton } from "../SignOutButton";
 
 export default function Navbar() {
