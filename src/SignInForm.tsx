@@ -3,57 +3,54 @@ import { useAuth } from "@/lib/auth";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from '@react-oauth/google';
 
 export function SignInForm() {
-  const { login } = useAuth();
+  const { login } = useAuth(); // login here expects the credential string now
   const navigate = useNavigate();
-  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSuccess = async (credentialResponse: any) => {
+      try {
+          if (credentialResponse.credential) {
+              // @ts-ignore
+              await login(credentialResponse.credential);
+              toast.success("Signed in successfully");
+              navigate("/admin");
+          }
+      } catch (err) {
+          setError("Authentication failed. Please try again.");
+          toast.error("Authentication failed");
+      }
+  };
+
+  const handleError = () => {
+      setError("Google Login Failed");
+      toast.error("Google Login Failed");
+  };
 
   return (
-    <div className="w-full border border-gray-200 p-6 rounded-lg bg-white shadow-sm">
+    <div className="w-full border border-gray-200 p-6 rounded-lg bg-white shadow-sm flex flex-col items-center">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Sign In</h2>
         <p className="text-gray-600">Enter your credentials to access the admin panel</p>
       </div>
-      <form
-        className="flex flex-col gap-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          setSubmitting(true);
-          // Simulate network delay
-          setTimeout(() => {
-            login();
-            toast.success("Signed in successfully");
-            navigate("/admin");
-            setSubmitting(false);
-          }, 500);
-        }}
-      >
-        <input
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-          type="email"
-          name="email"
-          placeholder="Email (any)"
-          required
-        />
-        <input
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-          type="password"
-          name="password"
-          placeholder="Password (any)"
-          required
-        />
-        <button 
-            className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 transition-colors disabled:opacity-50" 
-            type="submit" 
-            disabled={submitting}
-        >
-          {submitting ? "Signing in..." : "Sign in"}
-        </button>
-      </form>
+      
+      <div className="w-full flex justify-center">
+          <GoogleLogin
+            onSuccess={handleSuccess}
+            onError={handleError}
+            useOneTap
+          />
+      </div>
+      
+      {error && (
+        <p className="mt-4 text-sm text-red-500 text-center">{error}</p>
+      )}
+
       <div className="mt-4 text-center">
         <p className="text-sm text-gray-500">
-           (This is a mock login. Any email/password will work)
+           Sign in with your Google account
         </p>
       </div>
     </div>
