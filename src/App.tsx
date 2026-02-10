@@ -11,7 +11,7 @@ import AboutPage from "./pages/AboutPage";
 import GalleryPage from "./pages/GalleryPage";
 import ContactPage from "./pages/ContactPage";
 import AdminDashboard from "./pages/AdminDashboard";
-import { SignInForm } from "./SignInForm";
+import AuthPage from "./pages/AuthPage";
 
 export default function App() {
   return (
@@ -34,11 +34,7 @@ export default function App() {
             } />
             <Route path="/login" element={
               <Unauthenticated>
-                <div className="min-h-screen flex items-center justify-center">
-                  <div className="w-full max-w-md">
-                    <SignInForm />
-                  </div>
-                </div>
+                <AuthPage />
               </Unauthenticated>
             } />
           </Routes>

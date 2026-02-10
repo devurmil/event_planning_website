@@ -1,5 +1,5 @@
 "use client";
-import { useAuth } from "@/lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -13,12 +13,11 @@ export function SignInForm() {
   const handleSuccess = async (credentialResponse: any) => {
       try {
           if (credentialResponse.credential) {
-              // @ts-ignore
               await login(credentialResponse.credential);
               toast.success("Signed in successfully");
-              navigate("/admin");
+              void navigate("/admin");
           }
-      } catch (err) {
+      } catch (err) { // eslint-disable-line @typescript-eslint/no-unused-vars
           setError("Authentication failed. Please try again.");
           toast.error("Authentication failed");
       }
@@ -33,12 +32,12 @@ export function SignInForm() {
     <div className="w-full border border-gray-200 p-6 rounded-lg bg-white shadow-sm flex flex-col items-center">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Sign In</h2>
-        <p className="text-gray-600">Enter your credentials to access the admin panel</p>
+        <p className="text-gray-600">Access with your Google or Gmail account</p>
       </div>
       
       <div className="w-full flex justify-center">
           <GoogleLogin
-            onSuccess={handleSuccess}
+            onSuccess={(response: any) => { void handleSuccess(response); }}
             onError={handleError}
             useOneTap
           />
@@ -50,7 +49,7 @@ export function SignInForm() {
 
       <div className="mt-4 text-center">
         <p className="text-sm text-gray-500">
-           Sign in with your Google account
+           Sign in with your Google or Gmail account
         </p>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema({
   email: {
@@ -15,13 +15,17 @@ const UserSchema = new mongoose.Schema({
   },
   googleId: {
     type: String,
-    required: true,
     unique: true,
+    sparse: true,
+  },
+  password: {
+    type: String,
+    select: false,
   },
   role: {
     type: String,
-    default: 'user',
-    enum: ['user', 'admin'],
+    default: "user",
+    enum: ["user", "admin"],
   },
   createdAt: {
     type: Date,
@@ -29,4 +33,4 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model('User', UserSchema);
+export default mongoose.model("User", UserSchema);

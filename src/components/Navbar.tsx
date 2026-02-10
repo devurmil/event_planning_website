@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useAuth, Authenticated, Unauthenticated } from "@/lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { SignOutButton } from "../SignOutButton";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -46,23 +47,24 @@ export default function Navbar() {
           </div>
 
           <div className="hidden md:flex justify-end items-center space-x-4">
-              <Authenticated>
-                <Link
-                  to="/admin"
-                  className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
-                >
-                  Admin
-                </Link>
-                <SignOutButton />
-              </Authenticated>
-              <Unauthenticated>
+              {isAuthenticated ? (
+                <>
+                    <Link
+                    to="/admin"
+                    className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                    >
+                    Admin
+                    </Link>
+                    <SignOutButton />
+                </>
+              ) : (
                 <Link
                   to="/login"
                   className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
                 >
                   Login
                 </Link>
-              </Unauthenticated>
+              )}
           </div>
 
           {/* Mobile menu button */}
@@ -100,7 +102,7 @@ export default function Navbar() {
                   {link.name}
                 </Link>
               ))}
-              <Authenticated>
+              {isAuthenticated ? (
                 <Link
                   to="/admin"
                   onClick={() => setIsOpen(false)}
@@ -108,8 +110,7 @@ export default function Navbar() {
                 >
                   Admin
                 </Link>
-              </Authenticated>
-              <Unauthenticated>
+              ) : (
                 <Link
                   to="/login"
                   onClick={() => setIsOpen(false)}
@@ -117,7 +118,7 @@ export default function Navbar() {
                 >
                   Login
                 </Link>
-              </Unauthenticated>
+              )}
             </div>
           </div>
         )}
