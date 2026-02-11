@@ -12,7 +12,7 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   user: User | null;
-  login: (credential: string) => Promise<void>;
+  login: (credential: string) => Promise<User>;
   logout: () => void;
   updateUser: (user: User | null) => void;
 }
@@ -28,5 +28,5 @@ export function useAuth() {
 }
 
 export function useConvexAuth() {
-    return useAuth();
+  return useAuth();
 }

@@ -6,7 +6,7 @@ import { SignOutButton } from "../SignOutButton";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -22,8 +22,8 @@ export default function Navbar() {
   return (
     <nav className="fixed top-2 left-1/2 -translate-x-1/2 z-50 w-full px-2">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-3 items-center leading-none rounded-2xl max-w-6xl mx-auto px-6 py-2 bg-slate-900/50 backdrop-blur-md border border-white/10 shadow-sm text-white">
-          <div className="flex items-center">
+        <div className="flex justify-between items-center leading-none rounded-2xl max-w-6xl mx-auto px-6 py-2 bg-slate-900/50 backdrop-blur-md border border-white/10 shadow-sm text-white">
+          <div className="flex items-center flex-1">
             <Link to="/" className="flex-shrink-0 flex items-center">
               <span className="text-2xl font-bold text-white">EventSphere</span>
             </Link>
@@ -35,36 +35,37 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 to={link.path}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive(link.path)
-                    ? "text-purple-600 bg-purple-50"
-                    : "text-white hover:text-purple-600 hover:bg-purple-50"
-                }`}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive(link.path)
+                  ? "text-purple-600 bg-purple-50"
+                  : "text-white hover:text-purple-600 hover:bg-purple-50"
+                  }`}
               >
                 {link.name}
               </Link>
             ))}
           </div>
 
-          <div className="hidden md:flex justify-end items-center space-x-4">
-              {isAuthenticated ? (
-                <>
-                    <Link
+          <div className="hidden md:flex justify-end items-center space-x-4 flex-1">
+            {isAuthenticated ? (
+              <>
+                {user?.role === "admin" && (
+                  <Link
                     to="/admin"
                     className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
-                    >
+                  >
                     Admin
-                    </Link>
-                    <SignOutButton />
-                </>
-              ) : (
-                <Link
-                  to="/login"
-                  className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
-                >
-                  Login
-                </Link>
-              )}
+                  </Link>
+                )}
+                <SignOutButton />
+              </>
+            ) : (
+              <Link
+                to="/login"
+                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+              >
+                Login
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -93,23 +94,26 @@ export default function Navbar() {
                   key={link.name}
                   to={link.path}
                   onClick={() => setIsOpen(false)}
-                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                    isActive(link.path)
-                      ? "text-purple-600 bg-purple-50"
-                      : "text-gray-700 hover:text-purple-600 hover:bg-purple-50"
-                  }`}
+                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive(link.path)
+                    ? "text-purple-600 bg-purple-50"
+                    : "text-gray-700 hover:text-purple-600 hover:bg-purple-50"
+                    }`}
                 >
                   {link.name}
                 </Link>
               ))}
               {isAuthenticated ? (
-                <Link
-                  to="/admin"
-                  onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2 text-purple-600 hover:bg-purple-50 rounded-md"
-                >
-                  Admin
-                </Link>
+                <>
+                  {user?.role === "admin" && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-3 py-2 text-purple-600 hover:bg-purple-50 rounded-md"
+                    >
+                      Admin
+                    </Link>
+                  )}
+                </>
               ) : (
                 <Link
                   to="/login"

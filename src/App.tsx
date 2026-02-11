@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Authenticated, Unauthenticated } from "./lib/auth";
+import { Authenticated, Unauthenticated, AuthenticatedAdmin } from "./lib/auth";
 import { Toaster } from "sonner";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -21,16 +21,32 @@ export default function App() {
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/events" element={<EventsPage />} />
-            <Route path="/events/:id" element={<EventDetailsPage />} />
-            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/events" element={
+              <Authenticated>
+                <EventsPage />
+              </Authenticated>
+            } />
+            <Route path="/events/:id" element={
+              <Authenticated>
+                <EventDetailsPage />
+              </Authenticated>
+            } />
+            <Route path="/services" element={
+              <Authenticated>
+                <ServicesPage />
+              </Authenticated>
+            } />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/gallery" element={<GalleryPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/admin" element={
+            <Route path="/contact" element={
               <Authenticated>
-                <AdminDashboard />
+                <ContactPage />
               </Authenticated>
+            } />
+            <Route path="/admin" element={
+              <AuthenticatedAdmin>
+                <AdminDashboard />
+              </AuthenticatedAdmin>
             } />
             <Route path="/login" element={
               <Unauthenticated>
@@ -39,7 +55,9 @@ export default function App() {
             } />
           </Routes>
         </main>
-        <Footer />
+        <Authenticated>
+          <Footer />
+        </Authenticated>
         <Toaster />
       </div>
     </Router>
