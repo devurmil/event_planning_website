@@ -1,36 +1,33 @@
-import { useQuery } from "@/hooks/use-local-convex";
-import { localApi as api } from "@/lib/db";
-import { TeamMember } from "@/lib/types";
-
+import urmil_img from "@/assets/Urmil.png";
+import aryan_img from "@/assets/Aryan.png";
+import vraj_img from "@/assets/Vraj.png";
 export default function AboutPage() {
-  const team = useQuery<TeamMember[]>(api.events.getTeam) || [];
+  // const team = useQuery<TeamMember[]>(api.events.getTeam) || [];
 
   // Example team data
-  const exampleTeam = [
+  const displayTeam = [
     {
       id: 1,
       name: "Urmil Ramani",
       position: "Founder & Lead Planner",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=300",
+      image: urmil_img,
       bio: "With over 15 years of experience in event planning, Urmil founded EventPro with a vision to create unforgettable experiences. She specializes in luxury weddings and corporate events."
     },
     {
       id: 2,
       name: "Aryan Dhandhukiya",
       position: "Creative Director",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300",
+      image: aryan_img,
       bio: "Aryan brings artistic vision to every event with his background in interior design and visual arts. He leads our decoration and design team with creativity and precision."
     },
     {
       id: 3,
       name: "Vraj Patel",
       position: "Technical Coordinator",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300",
+      image: vraj_img,
       bio: "Vraj handles all technical aspects including sound, lighting, and AV equipment. His expertise ensures flawless technical execution for every event."
     }
   ];
-
-  const displayTeam = team.length > 0 ? team : exampleTeam;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -39,7 +36,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl font-bold mb-6">About EventPro</h1>
           <p className="text-xl max-w-3xl mx-auto">
-            Creating extraordinary events and unforgettable memories since 2010. 
+            Creating extraordinary events and unforgettable memories since 2010.
             We are passionate about bringing your vision to life with precision and creativity.
           </p>
         </div>
@@ -53,20 +50,20 @@ export default function AboutPage() {
               <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Story</h2>
               <div className="space-y-4 text-gray-700 text-lg leading-relaxed">
                 <p>
-                  EventPro was founded in 2010 with a simple yet powerful vision: to create 
-                  extraordinary events that exceed expectations and create lasting memories. 
-                  What started as a small team of passionate event enthusiasts has grown into 
+                  EventPro was founded in 2010 with a simple yet powerful vision: to create
+                  extraordinary events that exceed expectations and create lasting memories.
+                  What started as a small team of passionate event enthusiasts has grown into
                   a full-service event planning company.
                 </p>
                 <p>
-                  Over the years, we've had the privilege of planning and executing hundreds 
-                  of events, from intimate gatherings to grand celebrations. Each event has 
-                  taught us something new and helped us refine our approach to creating 
+                  Over the years, we've had the privilege of planning and executing hundreds
+                  of events, from intimate gatherings to grand celebrations. Each event has
+                  taught us something new and helped us refine our approach to creating
                   truly memorable experiences.
                 </p>
                 <p>
-                  Today, we're proud to be one of the most trusted event planning companies 
-                  in the region, known for our attention to detail, creative solutions, and 
+                  Today, we're proud to be one of the most trusted event planning companies
+                  in the region, known for our attention to detail, creative solutions, and
                   unwavering commitment to client satisfaction.
                 </p>
               </div>
@@ -94,12 +91,12 @@ export default function AboutPage() {
               </div>
               <h3 className="text-3xl font-bold text-gray-900 mb-4">Our Mission</h3>
               <p className="text-gray-700 text-lg leading-relaxed">
-                To transform your special moments into extraordinary experiences through 
-                meticulous planning, creative design, and flawless execution. We believe 
+                To transform your special moments into extraordinary experiences through
+                meticulous planning, creative design, and flawless execution. We believe
                 every event should be as unique as the people celebrating it.
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,8 +106,8 @@ export default function AboutPage() {
               </div>
               <h3 className="text-3xl font-bold text-gray-900 mb-4">Our Vision</h3>
               <p className="text-gray-700 text-lg leading-relaxed">
-                To be the leading event planning company known for innovation, excellence, 
-                and creating magical moments that bring people together. We envision a world 
+                To be the leading event planning company known for innovation, excellence,
+                and creating magical moments that bring people together. We envision a world
                 where every celebration is perfectly crafted and deeply meaningful.
               </p>
             </div>
@@ -127,7 +124,7 @@ export default function AboutPage() {
               These core values guide everything we do and shape how we serve our clients
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center p-6">
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -137,11 +134,11 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-semibold mb-3">Excellence</h3>
               <p className="text-gray-600">
-                We strive for perfection in every detail, ensuring that each event meets 
+                We strive for perfection in every detail, ensuring that each event meets
                 the highest standards of quality and execution.
               </p>
             </div>
-            
+
             <div className="text-center p-6">
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,11 +147,11 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-semibold mb-3">Creativity</h3>
               <p className="text-gray-600">
-                We bring fresh ideas and innovative solutions to every event, creating 
+                We bring fresh ideas and innovative solutions to every event, creating
                 unique experiences that reflect your personal style.
               </p>
             </div>
-            
+
             <div className="text-center p-6">
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,7 +160,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-semibold mb-3">Integrity</h3>
               <p className="text-gray-600">
-                We build trust through honest communication, transparent pricing, and 
+                We build trust through honest communication, transparent pricing, and
                 reliable service that you can count on.
               </p>
             </div>
@@ -180,14 +177,14 @@ export default function AboutPage() {
               Our passionate team of professionals brings years of experience and creativity to every event
             </p>
           </div>
-          
-          <div className="flex flex-col mx-auto md:flex-row lg:flex-row gap-8">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {displayTeam.map((member) => (
-              <div key={'id' in member ? member.id : member._id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div key={member.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                 <img
                   src={member.image}
                   alt={member.name}
-                  className="w-full h-64 object-cover"
+                  className="w-full h-[400px] object-cover object-top"
                 />
                 <div className="p-6">
                   <h3 className="text-xl font-semibold mb-1">{member.name}</h3>
