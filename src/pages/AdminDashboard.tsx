@@ -1,10 +1,26 @@
 import { useState } from "react";
-import { useQuery } from "@/hooks/use-local-convex";
+import { useQuery, useMutation } from "@/hooks/use-local-convex";
 import { localApi as api } from "@/lib/db";
+import AddEventModal from "../components/AddEventModal";
+import { Event } from "@/lib/types";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
-  
+  const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
+
+  const allEvents = useQuery<Event[]>(api.events.getAllEvents) || [];
+  const deleteEvent = useMutation(api.events.remove);
+
+  const handleDeleteEvent = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this event?")) {
+      try {
+        await deleteEvent({ id });
+      } catch (error) {
+        console.error("Failed to delete event:", error);
+      }
+    }
+  };
+
   // This would normally fetch real data from your Convex backend
   // For now, we'll use example data
   const exampleBookings = [
@@ -67,11 +83,10 @@ export default function AdminDashboard() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === tab.id
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
                     ? "border-purple-500 text-purple-600"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
+                  }`}
               >
                 <span className="mr-2">{tab.icon}</span>
                 {tab.name}
@@ -114,11 +129,10 @@ export default function AdminDashboard() {
                           <p className="font-medium text-gray-900">{booking.clientName}</p>
                           <p className="text-sm text-gray-600">{booking.eventType} - {booking.eventDate}</p>
                         </div>
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          booking.status === "confirmed" 
-                            ? "bg-green-100 text-green-800" 
+                        <span className={`px-2 py-1 text-xs rounded-full ${booking.status === "confirmed"
+                            ? "bg-green-100 text-green-800"
                             : "bg-yellow-100 text-yellow-800"
-                        }`}>
+                          }`}>
                           {booking.status}
                         </span>
                       </div>
@@ -206,11 +220,10 @@ export default function AdminDashboard() {
                         <div className="text-sm text-gray-900">${booking.budget.toLocaleString()}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          booking.status === "confirmed" 
-                            ? "bg-green-100 text-green-800" 
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${booking.status === "confirmed"
+                            ? "bg-green-100 text-green-800"
                             : "bg-yellow-100 text-yellow-800"
-                        }`}>
+                          }`}>
                           {booking.status}
                         </span>
                       </td>
@@ -228,16 +241,61 @@ export default function AdminDashboard() {
 
         {/* Events Tab */}
         {activeTab === "events" && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-medium text-gray-900">Event Packages</h3>
-              <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
-                + Add New Event
-              </button>
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium text-gray-900">Event Packages</h3>
+                <button
+                  onClick={() => setIsAddEventModalOpen(true)}
+                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  + Add New Event
+                </button>
+              </div>
             </div>
-            <div className="text-center py-12">
-              <p className="text-gray-500">Event management interface would go here.</p>
-              <p className="text-sm text-gray-400 mt-2">This would include creating, editing, and managing event packages.</p>
+            <div className="overflow-x-auto">
+              {allEvents.length > 0 ? (
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {allEvents.map((event) => (
+                      <tr key={event._id}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <img className="h-10 w-10 rounded-full object-cover mr-3" src={event.imageUrl} alt="" />
+                            <div className="text-sm font-medium text-gray-900">{event.title}</div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800 capitalize">
+                            {event.category}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button className="text-purple-600 hover:text-purple-900 mr-3">Edit</button>
+                          <button
+                            onClick={() => handleDeleteEvent(event._id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">No event packages found.</p>
+                  <p className="text-sm text-gray-400 mt-2">Add your first event package to get started.</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -258,6 +316,10 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+      <AddEventModal
+        isOpen={isAddEventModalOpen}
+        onClose={() => setIsAddEventModalOpen(false)}
+      />
     </div>
   );
 }

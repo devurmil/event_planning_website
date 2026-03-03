@@ -43,7 +43,7 @@ export const insert = (collection: string, item: any) => {
 export const update = (collection: string, id: string, updates: any) => {
   const db = loadDB();
   if (!db[collection]) return null;
-  
+
   const index = db[collection].findIndex((item: any) => item._id === id);
   if (index === -1) return null;
 
@@ -56,7 +56,7 @@ export const update = (collection: string, id: string, updates: any) => {
 export const remove = (collection: string, id: string) => {
   const db = loadDB();
   if (!db[collection]) return;
-  
+
   db[collection] = db[collection].filter((item: any) => item._id !== id);
   saveDB(db);
 };
@@ -71,18 +71,53 @@ export const localApi = {
     getEventById: "events:getById",
     getServices: "services:all",
     getTeam: "team:all",
+    create: "events:create",
+    remove: "events:delete",
   },
   bookings: {
     create: "bookings:create",
   }
 };
 
+const API_BASE_URL = "http://localhost:5000/api";
+
 // Actually implementing the logic for the "queries" above
 export const resolvers = {
-  "events:featured": () => query("events", (e) => e.isFeatured),
+  "events:featured": async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/events`);
+      if (response.ok) {
+        const events = await response.json();
+        return events.filter((e: any) => e.isFeatured);
+      }
+    } catch (error) {
+      console.error("Failed to fetch featured events from server, falling back to local", error);
+    }
+    return query("events", (e) => e.isFeatured);
+  },
   "testimonials:all": () => query("testimonials"),
-  "events:all": () => query("events"),
-  "events:getById": (args: { id: string }) => {
+  "events:all": async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/events`);
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (error) {
+      console.error("Failed to fetch events from server, falling back to local", error);
+    }
+    return query("events");
+  },
+  "events:getById": async (args: { id: string }) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/events`);
+      if (response.ok) {
+        const events = await response.json();
+        const event = events.find((e: any) => e._id === args.id);
+        if (event) return event;
+      }
+    } catch (error) {
+      console.error("Failed to fetch event by id from server, falling back to local", error);
+    }
     const events = query("events");
     // @ts-ignore
     return events.find((e: any) => e._id === args.id);
@@ -90,4 +125,36 @@ export const resolvers = {
   "services:all": () => query("services"),
   "team:all": () => query("team"),
   "bookings:create": (args: any) => insert("bookings", args),
+  "events:create": async (args: any) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/events`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(args),
+      });
+      if (response.ok) {
+        const newEvent = await response.json();
+        window.dispatchEvent(new Event("db-update"));
+        return newEvent;
+      }
+    } catch (error) {
+      console.error("Failed to create event on server", error);
+    }
+    return insert("events", args);
+  },
+  "events:delete": async (args: { id: string }) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/events/${args.id}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        window.dispatchEvent(new Event("db-update"));
+        return true;
+      }
+    } catch (error) {
+      console.error("Failed to delete event on server", error);
+    }
+    remove("events", args.id);
+    return true;
+  }
 };

@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import { OAuth2Client } from "google-auth-library";
 import bcrypt from "bcryptjs";
 import User from "./models/User.js";
+import Event from "./models/Event.js";
+
 
 dotenv.config();
 
@@ -128,6 +130,73 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
+// Event Routes
+app.get("/api/events", async (req, res) => {
+  try {
+    const events = await Event.find().sort({ createdAt: -1 });
+    res.status(200).json(events);
+  } catch (error) {
+    console.error("Fetch events error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.post("/api/events", async (req, res) => {
+  const { title, category, imageUrl, description, shortDescription, features, pricing, gallery, timeline } = req.body;
+
+  try {
+    const newEvent = new Event({
+      title,
+      category,
+      imageUrl,
+      description,
+      shortDescription,
+      features,
+      pricing,
+      gallery,
+      timeline,
+    });
+
+    await newEvent.save();
+    res.status(201).json(newEvent);
+  } catch (error) {
+    console.error("Create event error:", error);
+    res.status(500).json({ error: error.message, message: "Internal server error" });
+  }
+});
+
+app.put("/api/events/:id", async (req, res) => {
+  const { id } = req.params;
+  const updateData = req.body;
+
+  try {
+    const updatedEvent = await Event.findByIdAndUpdate(id, updateData, { new: true });
+    if (!updatedEvent) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+    res.status(200).json(updatedEvent);
+  } catch (error) {
+    console.error("Update event error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.delete("/api/events/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedEvent = await Event.findByIdAndDelete(id);
+    if (!deletedEvent) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+    res.status(200).json({ message: "Event deleted successfully" });
+  } catch (error) {
+    console.error("Delete event error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 app.listen(PORT, () => {
+
   console.log(`Server is running on port ${PORT}`);
 });
