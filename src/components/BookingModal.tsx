@@ -1,31 +1,43 @@
 import { useState, FormEvent } from 'react';
+import { Event } from '@/lib/types';
+import { useMutation } from "@/hooks/use-local-convex";
+import { localApi as api } from "@/lib/db";
 
 interface BookingModalProps {
     isOpen: boolean;
     onClose: () => void;
     eventName?: string;
+    initialPackage?: string;
+    event?: Event;
 }
 
-export default function BookingModal({ isOpen, onClose, eventName }: BookingModalProps) {
-    if (!isOpen) return null;
+const SERVICE_PRICES: Record<string, number> = {
+    decoration: 500,
+    catering: 1200,
+    photography: 800,
+    music: 450,
+    lighting: 350,
+    hosting: 600,
+};
+
+export default function BookingModal({ isOpen, onClose, eventName, initialPackage, event }: BookingModalProps) {
+    const createBooking = useMutation(api.bookings.create);
 
     const [formData, setFormData] = useState({
         // 1. Event Basics
         eventType: 'Wedding',
         eventTitle: eventName || '',
         eventDate: '',
-        eventTime: '',
         duration: '',
 
         // 2. Guest & Venue
         guestCount: '',
         venueName: '',
         city: '',
-        locationType: 'indoor', // indoor/outdoor
+        locationType: 'indoor',
 
         // 3. Budget & Package
-        budgetRange: '',
-        packageType: 'basic',
+        packageType: initialPackage || 'basic',
 
         // 4. Services
         services: {
@@ -46,14 +58,34 @@ export default function BookingModal({ isOpen, onClose, eventName }: BookingModa
         notes: '',
     });
 
+    // ⚠️ All hooks must be above this early return
+    if (!isOpen) return null;
+
+    const currentPrice = () => {
+        if (formData.packageType === 'custom') {
+            return Object.entries(formData.services).reduce((total, [service, selected]) => {
+                if (selected) {
+                    return total + (SERVICE_PRICES[service] || 0);
+                }
+                return total;
+            }, 0);
+        }
+        if (!event || !event.pricing) return null;
+        if (formData.packageType === 'basic') return event.pricing.basic;
+        if (formData.packageType === 'premium') return event.pricing.premium;
+        if (formData.packageType === 'luxury') return event.pricing.luxury;
+        return null;
+    };
+
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData((prev: any) => ({ ...prev, [name]: value }));
     };
 
     const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, checked } = e.target;
-        setFormData(prev => ({
+        setFormData((prev: any) => ({
             ...prev,
             services: {
                 ...prev.services,
@@ -62,12 +94,22 @@ export default function BookingModal({ isOpen, onClose, eventName }: BookingModa
         }));
     };
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        console.log('Booking Request:', formData);
-        // Here you would typically send data to backend
-        alert('Booking request received! We will contact you shortly.');
-        onClose();
+
+        try {
+            await createBooking({
+                ...formData,
+                eventId: event?._id,
+                totalPrice: currentPrice(),
+                status: 'pending'
+            });
+            alert('Booking request submitted successfully! We will contact you shortly.');
+            onClose();
+        } catch (error) {
+            console.error('Booking error:', error);
+            alert('Failed to submit booking. Please try again.');
+        }
     };
 
     return (
@@ -122,17 +164,6 @@ export default function BookingModal({ isOpen, onClose, eventName }: BookingModa
                                 />
                             </div>
                             <div className="flex gap-4">
-                                <div className="flex-1">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
-                                    <input
-                                        type="time"
-                                        name="eventTime"
-                                        value={formData.eventTime}
-                                        onChange={handleInputChange}
-                                        required
-                                        className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-purple-500 focus:border-purple-500"
-                                    />
-                                </div>
                                 <div className="flex-1">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Duration (Hours)</label>
                                     <input
@@ -214,21 +245,6 @@ export default function BookingModal({ isOpen, onClose, eventName }: BookingModa
                         <h3 className="text-lg font-semibold text-purple-700 mb-4 border-b pb-2">3. Budget & Package</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Budget Range</label>
-                                <select
-                                    name="budgetRange"
-                                    value={formData.budgetRange}
-                                    onChange={handleInputChange}
-                                    className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-purple-500 focus:border-purple-500"
-                                >
-                                    <option value="">Select Range</option>
-                                    <option value="<1000">Less than $1,000</option>
-                                    <option value="1000-5000">$1,000 - $5,000</option>
-                                    <option value="5000-10000">$5,000 - $10,000</option>
-                                    <option value="10000+">$10,000+</option>
-                                </select>
-                            </div>
-                            <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Package</label>
                                 <select
                                     name="packageType"
@@ -238,30 +254,50 @@ export default function BookingModal({ isOpen, onClose, eventName }: BookingModa
                                 >
                                     <option value="basic">Basic</option>
                                     <option value="premium">Premium</option>
+                                    <option value="luxury">Luxury</option>
                                     <option value="custom">Custom</option>
                                 </select>
                             </div>
+                            {currentPrice() !== null && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        {formData.packageType === 'custom' ? 'Estimated Total' : 'Package Price'}
+                                    </label>
+                                    <div className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-purple-700 font-bold animate-pulse-once">
+                                        ${currentPrice()}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </section>
 
-                    {/* 4. Services Needed */}
-                    <section>
-                        <h3 className="text-lg font-semibold text-purple-700 mb-4 border-b pb-2">4. Services Needed</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            {Object.keys(formData.services).map((service) => (
-                                <label key={service} className="flex items-center capitalize">
-                                    <input
-                                        type="checkbox"
-                                        name={service}
-                                        checked={formData.services[service as keyof typeof formData.services]}
-                                        onChange={handleCheckboxChange}
-                                        className="mr-2 text-purple-600 rounded focus:ring-purple-500"
-                                    />
-                                    {service}
-                                </label>
-                            ))}
-                        </div>
-                    </section>
+                    {/* 4. Services Needed (Only if Custom) */}
+                    {formData.packageType === 'custom' && (
+                        <section>
+                            <h3 className="text-lg font-semibold text-purple-700 mb-4 border-b pb-2">4. Services Needed</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {Object.keys(formData.services).map((service) => (
+                                    <label key={service} className="flex items-center justify-between p-3 border rounded-lg hover:border-purple-300 cursor-pointer transition-colors group">
+                                        <div className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                name={service}
+                                                checked={formData.services[service as keyof typeof formData.services]}
+                                                onChange={handleCheckboxChange}
+                                                className="mr-3 h-5 w-5 text-purple-600 rounded focus:ring-purple-500"
+                                            />
+                                            <span className="capitalize text-gray-700 group-hover:text-purple-700 transition-colors">
+                                                {service}
+                                            </span>
+                                        </div>
+                                        <span className="text-sm font-semibold text-purple-500">
+                                            +${SERVICE_PRICES[service]}
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
+                        </section>
+                    )}
 
                     {/* 5. Contact Details */}
                     <section>

@@ -11,6 +11,7 @@ import AboutPage from "./pages/AboutPage";
 import GalleryPage from "./pages/GalleryPage";
 import ContactPage from "./pages/ContactPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import MyBookingsPage from "./pages/MyBookingsPage";
 import AuthPage from "./pages/AuthPage";
 
 export default function App() {
@@ -41,6 +42,11 @@ export default function App() {
             <Route path="/contact" element={
               <Authenticated>
                 <ContactPage />
+              </Authenticated>
+            } />
+            <Route path="/my-bookings" element={
+              <Authenticated>
+                <MyBookingsPage />
               </Authenticated>
             } />
             <Route path="/admin" element={

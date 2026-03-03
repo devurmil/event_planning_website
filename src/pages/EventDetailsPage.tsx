@@ -3,26 +3,23 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@/hooks/use-local-convex";
 import { localApi as api } from "@/lib/db";
 import { Event } from "@/lib/types";
+import BookingModal from "../components/BookingModal";
+
 
 export default function EventDetailsPage() {
   const { id } = useParams();
   const event = useQuery<Event>(api.events.getEventById, { id: id as string });
   const createBooking = useMutation(api.bookings.create);
-  
+
   const [selectedPackage, setSelectedPackage] = useState("basic");
-  const [showBookingForm, setShowBookingForm] = useState(false);
-  const [formData, setFormData] = useState({
-    clientName: "",
-    clientEmail: "",
-    clientPhone: "",
-    eventDate: "",
-    guestCount: "",
-    message: "",
-  });
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+
 
   // Example event data for when no event is loaded
-  const exampleEvent = {
+  const exampleEvent: Event = {
+    _id: "example",
     title: "Elegant Garden Wedding",
+    isFeatured: true,
     category: "wedding",
     description: "Create your dream wedding in a beautiful garden setting with our comprehensive wedding planning service. We handle every detail from venue decoration to vendor coordination, ensuring your special day is perfect in every way.",
     shortDescription: "Beautiful outdoor wedding ceremony with floral arrangements and elegant decor",
@@ -57,44 +54,10 @@ export default function EventDetailsPage() {
 
   const displayEvent = event || exampleEvent;
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const handleOpenBooking = () => {
+    setIsBookingModalOpen(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!event) return;
-
-    try {
-      await createBooking({
-        eventId: event._id,
-        clientName: formData.clientName,
-        clientEmail: formData.clientEmail,
-        clientPhone: formData.clientPhone,
-        eventDate: formData.eventDate,
-        guestCount: parseInt(formData.guestCount),
-        package: selectedPackage,
-        budget: displayEvent.pricing[selectedPackage as keyof typeof displayEvent.pricing],
-        message: formData.message,
-      });
-      
-      setShowBookingForm(false);
-      setFormData({
-        clientName: "",
-        clientEmail: "",
-        clientPhone: "",
-        eventDate: "",
-        guestCount: "",
-        message: "",
-      });
-      alert("Booking request submitted successfully!");
-    } catch (error) {
-      alert("Error submitting booking. Please try again.");
-    }
-  };
 
   const packageDetails = {
     basic: {
@@ -103,7 +66,7 @@ export default function EventDetailsPage() {
       features: ["Event coordination", "Basic decoration", "Vendor management"],
     },
     premium: {
-      name: "Premium Package", 
+      name: "Premium Package",
       price: displayEvent.pricing.premium,
       features: ["Everything in Basic", "Enhanced decoration", "Photography", "Catering coordination"],
     },
@@ -199,11 +162,10 @@ export default function EventDetailsPage() {
                 {Object.entries(packageDetails).map(([key, pkg]) => (
                   <div
                     key={key}
-                    className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                      selectedPackage === key
-                        ? "border-purple-600 bg-purple-50"
-                        : "border-gray-200 hover:border-purple-300"
-                    }`}
+                    className={`border rounded-lg p-4 cursor-pointer transition-colors ${selectedPackage === key
+                      ? "border-purple-600 bg-purple-50"
+                      : "border-gray-200 hover:border-purple-300"
+                      }`}
                     onClick={() => setSelectedPackage(key)}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -225,111 +187,22 @@ export default function EventDetailsPage() {
               </div>
             </div>
 
-            {/* Booking Form */}
+            {/* Booking Action */}
             <div className="bg-white rounded-lg shadow-lg p-6">
-              {!showBookingForm ? (
-                <div className="text-center">
-                  <h3 className="text-xl font-bold mb-4">Ready to Book?</h3>
-                  <p className="text-gray-600 mb-6">
-                    Selected: {packageDetails[selectedPackage as keyof typeof packageDetails].name}
-                  </p>
-                  <button
-                    onClick={() => setShowBookingForm(true)}
-                    className="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
-                  >
-                    Book This Event - ${packageDetails[selectedPackage as keyof typeof packageDetails].price}
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit}>
-                  <h3 className="text-xl font-bold mb-4">Book Your Event</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                      <input
-                        type="text"
-                        name="clientName"
-                        value={formData.clientName}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                      <input
-                        type="email"
-                        name="clientEmail"
-                        value={formData.clientEmail}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                      <input
-                        type="tel"
-                        name="clientPhone"
-                        value={formData.clientPhone}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Event Date</label>
-                      <input
-                        type="date"
-                        name="eventDate"
-                        value={formData.eventDate}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Guest Count</label>
-                      <input
-                        type="number"
-                        name="guestCount"
-                        value={formData.guestCount}
-                        onChange={handleInputChange}
-                        required
-                        min="1"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Special Requests</label>
-                      <textarea
-                        name="message"
-                        value={formData.message}
-                        onChange={handleInputChange}
-                        rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder="Any special requirements or requests..."
-                      />
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        type="submit"
-                        className="flex-1 bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors"
-                      >
-                        Submit Booking
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowBookingForm(false)}
-                        className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50 transition-colors"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              )}
+              <div className="text-center">
+                <h3 className="text-xl font-bold mb-4">Ready to Book?</h3>
+                <p className="text-gray-600 mb-6">
+                  Selected: {packageDetails[selectedPackage as keyof typeof packageDetails].name}
+                </p>
+                <button
+                  onClick={handleOpenBooking}
+                  className="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+                >
+                  Book This Event - ${packageDetails[selectedPackage as keyof typeof packageDetails].price}
+                </button>
+              </div>
             </div>
+
 
             {/* Contact Info */}
             <div className="bg-purple-50 rounded-lg p-6 mt-8">
@@ -347,6 +220,13 @@ export default function EventDetailsPage() {
           </div>
         </div>
       </div>
+      <BookingModal
+        isOpen={isBookingModalOpen}
+        onClose={() => setIsBookingModalOpen(false)}
+        eventName={displayEvent.title}
+        initialPackage={selectedPackage}
+        event={displayEvent}
+      />
     </div>
   );
 }

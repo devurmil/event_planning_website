@@ -11,6 +11,10 @@ export default function AdminDashboard() {
   const allEvents = useQuery<Event[]>(api.events.getAllEvents) || [];
   const deleteEvent = useMutation(api.events.remove);
 
+  const allBookings = useQuery<any[]>(api.bookings.getAll) || [];
+  const updateBookingStatus = useMutation(api.bookings.updateStatus);
+  const deleteBooking = useMutation(api.bookings.remove);
+
   const handleDeleteEvent = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this event?")) {
       try {
@@ -21,37 +25,23 @@ export default function AdminDashboard() {
     }
   };
 
-  // This would normally fetch real data from your Convex backend
-  // For now, we'll use example data
-  const exampleBookings = [
-    {
-      id: 1,
-      clientName: "Sarah Johnson",
-      eventType: "Wedding",
-      eventDate: "2024-06-15",
-      status: "confirmed",
-      budget: 5000,
-      guestCount: 150
-    },
-    {
-      id: 2,
-      clientName: "Tech Corp",
-      eventType: "Corporate Event",
-      eventDate: "2024-05-20",
-      status: "pending",
-      budget: 8000,
-      guestCount: 200
-    },
-    {
-      id: 3,
-      clientName: "Mike Chen",
-      eventType: "Birthday Party",
-      eventDate: "2024-04-10",
-      status: "confirmed",
-      budget: 1200,
-      guestCount: 50
+  const handleStatusChange = async (id: string, status: string) => {
+    try {
+      await updateBookingStatus({ id, status });
+    } catch (error) {
+      console.error("Failed to update status:", error);
     }
-  ];
+  };
+
+  const handleDeleteBooking = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this booking?")) {
+      try {
+        await deleteBooking({ id });
+      } catch (error) {
+        console.error("Failed to delete booking:", error);
+      }
+    }
+  };
 
   const tabs = [
     { id: "overview", name: "Overview", icon: "📊" },
@@ -84,8 +74,8 @@ export default function AdminDashboard() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
-                    ? "border-purple-500 text-purple-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  ? "border-purple-500 text-purple-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                   }`}
               >
                 <span className="mr-2">{tab.icon}</span>
@@ -123,20 +113,25 @@ export default function AdminDashboard() {
                 </div>
                 <div className="p-6">
                   <div className="space-y-4">
-                    {exampleBookings.slice(0, 3).map((booking) => (
-                      <div key={booking.id} className="flex items-center justify-between">
+                    {allBookings.slice(0, 5).map((booking) => (
+                      <div key={booking._id} className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium text-gray-900">{booking.clientName}</p>
-                          <p className="text-sm text-gray-600">{booking.eventType} - {booking.eventDate}</p>
+                          <p className="font-medium text-gray-900">{booking.fullName}</p>
+                          <p className="text-sm text-gray-600">{booking.eventType} - {new Date(booking.eventDate).toLocaleDateString()}</p>
                         </div>
                         <span className={`px-2 py-1 text-xs rounded-full ${booking.status === "confirmed"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
+                          ? "bg-green-100 text-green-800"
+                          : booking.status === "pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-gray-100 text-gray-800"
                           }`}>
                           {booking.status}
                         </span>
                       </div>
                     ))}
+                    {allBookings.length === 0 && (
+                      <p className="text-center text-gray-500 py-4">No recent bookings</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -202,37 +197,58 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {exampleBookings.map((booking) => (
-                    <tr key={booking.id}>
+                  {allBookings.map((booking) => (
+                    <tr key={booking._id}>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{booking.clientName}</div>
+                        <div className="text-sm font-medium text-gray-900">{booking.fullName}</div>
+                        <div className="text-xs text-gray-500">{booking.email}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{booking.eventType}</div>
+                        <div className="text-xs text-gray-500">{booking.eventTitle}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{booking.eventDate}</div>
+                        <div className="text-sm text-gray-900">{new Date(booking.eventDate).toLocaleDateString()}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{booking.guestCount}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">${booking.budget.toLocaleString()}</div>
+                        <div className="text-sm text-gray-900">${booking.totalPrice?.toLocaleString()}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${booking.status === "confirmed"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
-                          }`}>
-                          {booking.status}
-                        </span>
+                        <select
+                          value={booking.status}
+                          onChange={(e) => handleStatusChange(booking._id, e.target.value)}
+                          className={`text-xs font-semibold rounded-full px-2 py-1 outline-none border-none ${booking.status === "confirmed" ? "bg-green-100 text-green-800" :
+                              booking.status === "pending" ? "bg-yellow-100 text-yellow-800" :
+                                booking.status === "cancelled" ? "bg-red-100 text-red-800" :
+                                  "bg-gray-100 text-gray-800"
+                            }`}
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="confirmed">Confirmed</option>
+                          <option value="completed">Completed</option>
+                          <option value="cancelled">Cancelled</option>
+                        </select>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button className="text-purple-600 hover:text-purple-900 mr-3">Edit</button>
-                        <button className="text-red-600 hover:text-red-900">Delete</button>
+                        <button
+                          onClick={() => handleDeleteBooking(booking._id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   ))}
+                  {allBookings.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-12 text-center text-gray-500 italic">
+                        No bookings found.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

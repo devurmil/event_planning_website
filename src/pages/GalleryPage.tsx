@@ -26,7 +26,7 @@ export default function GalleryPage() {
       id: 2,
       category: "weddings",
       title: "Beach Wedding Ceremony",
-      image: "https://images.unsplash.com/photo-1465495976277-4387d4b0e4a6?w=600",
+      image: "https://images.unsplash.com/photo-1576694667642-6f289dd54187?q=80&w=687",
       description: "Romantic beachside wedding at sunset"
     },
     {

@@ -6,6 +6,7 @@ import { OAuth2Client } from "google-auth-library";
 import bcrypt from "bcryptjs";
 import User from "./models/User.js";
 import Event from "./models/Event.js";
+import Booking from "./models/Booking.js";
 
 
 dotenv.config();
@@ -192,6 +193,74 @@ app.delete("/api/events/:id", async (req, res) => {
     res.status(200).json({ message: "Event deleted successfully" });
   } catch (error) {
     console.error("Delete event error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Booking Routes
+app.get("/api/bookings", async (req, res) => {
+  try {
+    const bookings = await Booking.find().sort({ createdAt: -1 });
+    res.status(200).json(bookings);
+  } catch (error) {
+    console.error("Fetch bookings error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get("/api/bookings/user/:email", async (req, res) => {
+  const { email } = req.params;
+  try {
+    const bookings = await Booking.find({ email }).sort({ createdAt: -1 });
+    res.status(200).json(bookings);
+  } catch (error) {
+    console.error("Fetch user bookings error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.post("/api/bookings", async (req, res) => {
+  try {
+    const newBooking = new Booking(req.body);
+    await newBooking.save();
+    res.status(201).json(newBooking);
+  } catch (error) {
+    console.error("Create booking error:", error);
+    res.status(500).json({ error: error.message, message: "Internal server error" });
+  }
+});
+
+app.put("/api/bookings/:id/status", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const updatedBooking = await Booking.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+    if (!updatedBooking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+    res.status(200).json(updatedBooking);
+  } catch (error) {
+    console.error("Update booking status error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.delete("/api/bookings/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedBooking = await Booking.findByIdAndDelete(id);
+    if (!deletedBooking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+    res.status(200).json({ message: "Booking deleted successfully" });
+  } catch (error) {
+    console.error("Delete booking error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });

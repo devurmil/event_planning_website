@@ -75,7 +75,11 @@ export const localApi = {
     remove: "events:delete",
   },
   bookings: {
+    getAll: "bookings:all",
+    getByUser: "bookings:getByUser",
     create: "bookings:create",
+    updateStatus: "bookings:updateStatus",
+    remove: "bookings:delete",
   }
 };
 
@@ -124,7 +128,16 @@ export const resolvers = {
   },
   "services:all": () => query("services"),
   "team:all": () => query("team"),
-  "bookings:create": (args: any) => insert("bookings", args),
+  "bookings:create": async (args: any) => {
+    const response = await fetch(`${API_BASE_URL}/bookings`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(args),
+    });
+    const result = await response.json();
+    window.dispatchEvent(new CustomEvent("db-update"));
+    return result;
+  },
   "events:create": async (args: any) => {
     try {
       const response = await fetch(`${API_BASE_URL}/events`, {
@@ -143,18 +156,42 @@ export const resolvers = {
     return insert("events", args);
   },
   "events:delete": async (args: { id: string }) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/events/${args.id}`, {
-        method: "DELETE",
-      });
-      if (response.ok) {
-        window.dispatchEvent(new Event("db-update"));
-        return true;
-      }
-    } catch (error) {
-      console.error("Failed to delete event on server", error);
-    }
-    remove("events", args.id);
-    return true;
-  }
+    const response = await fetch(`${API_BASE_URL}/events/${args.id}`, {
+      method: "DELETE",
+    });
+    const result = await response.json();
+    window.dispatchEvent(new CustomEvent("db-update"));
+    return result;
+  },
+
+  // Bookings
+  "bookings:all": async () => {
+    const response = await fetch(`${API_BASE_URL}/bookings`);
+    return await response.json();
+  },
+
+  "bookings:getByUser": async (args: { email: string }) => {
+    const response = await fetch(`${API_BASE_URL}/bookings/user/${args.email}`);
+    return await response.json();
+  },
+
+  "bookings:updateStatus": async (args: { id: string; status: string }) => {
+    const response = await fetch(`${API_BASE_URL}/bookings/${args.id}/status`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: args.status }),
+    });
+    const result = await response.json();
+    window.dispatchEvent(new CustomEvent("db-update"));
+    return result;
+  },
+
+  "bookings:delete": async (args: { id: string }) => {
+    const response = await fetch(`${API_BASE_URL}/bookings/${args.id}`, {
+      method: "DELETE",
+    });
+    const result = await response.json();
+    window.dispatchEvent(new CustomEvent("db-update"));
+    return result;
+  },
 };

@@ -8,10 +8,10 @@ import BookingModal from "../components/BookingModal";
 export default function EventsPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [selectedEventName, setSelectedEventName] = useState("");
+  const [selectedEvent, setSelectedEvent] = useState<Event | undefined>(undefined);
 
-  const handleBookNow = (eventName: string) => {
-    setSelectedEventName(eventName);
+  const handleBookNow = (event: Event) => {
+    setSelectedEvent(event);
     setIsBookingModalOpen(true);
   };
 
@@ -30,61 +30,7 @@ export default function EventsPage() {
     ? allEvents
     : allEvents.filter((event: Event) => event.category === selectedCategory);
 
-  // Example events data for display
-  const exampleEvents = [
-    {
-      id: 1,
-      title: "Elegant Garden Wedding",
-      category: "wedding",
-      image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=400",
-      description: "Beautiful outdoor wedding ceremony with floral arrangements and elegant decor",
-      features: ["Venue decoration", "Floral arrangements", "Photography", "Catering coordination"]
-    },
-    {
-      id: 2,
-      title: "Corporate Annual Gala",
-      category: "corporate",
-      image: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=400",
-      description: "Professional corporate event with networking opportunities and presentations",
-      features: ["AV equipment", "Stage setup", "Networking area", "Professional lighting"]
-    },
-    {
-      id: 3,
-      title: "Kids/Adults Birthday Party",
-      category: "birthday",
-      image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=400",
-      description: "Fun-filled birthday celebration with games, entertainment, and themed decorations",
-      features: ["Themed decorations", "Entertainment", "Party games", "Birthday cake"]
-    },
-    {
-      id: 4,
-      title: "Live Music Concert",
-      category: "concert",
-      image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400",
-      description: "Intimate concert venue setup with professional sound and lighting systems",
-      features: ["Sound system", "Stage lighting", "Security", "Ticket management"]
-    },
-    {
-      id: 5,
-      title: "Golden Anniversary",
-      category: "anniversary",
-      image: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=400",
-      description: "Elegant anniversary celebration with personalized touches and memorable moments",
-      features: ["Elegant decor", "Memory displays", "Special dining", "Photography"]
-    },
-    {
-      id: 6,
-      title: "Product Launch Event",
-      category: "corporate",
-      image: "https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=400",
-      description: "Modern product launch with interactive displays and media coverage",
-      features: ["Product displays", "Media setup", "Presentation area", "Refreshments"]
-    }
-  ];
-
-  const displayEvents = filteredEvents.length > 0 ? filteredEvents :
-    (selectedCategory === "all" ? exampleEvents :
-      exampleEvents.filter((event: any) => event.category === selectedCategory));
+  const displayEvents = filteredEvents;
 
   return (
     <div className="min-h-screen bg-gray-50 pt-[5rem]">
@@ -115,10 +61,10 @@ export default function EventsPage() {
 
         {/* Events Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {displayEvents.map((event: any) => (
-            <div key={'id' in event ? event.id : event._id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+          {displayEvents.map((event: Event) => (
+            <div key={event._id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow flex flex-col">
               <img
-                src={'image' in event ? event.image : event.imageUrl}
+                src={event.imageUrl}
                 alt={event.title}
                 className="w-full h-48 object-cover"
               />
@@ -130,7 +76,7 @@ export default function EventsPage() {
                 </div>
                 <h3 className="text-xl font-semibold mb-3">{event.title}</h3>
                 <p className="text-gray-600 mb-4 line-clamp-2">
-                  {'shortDescription' in event ? event.shortDescription : event.description}
+                  {event.shortDescription || event.description}
                 </p>
 
                 {/* Features */}
@@ -148,15 +94,15 @@ export default function EventsPage() {
                   </ul>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 mt-auto">
                   <Link
-                    to={'_id' in event ? `/events/${event._id}` : "/contact"}
+                    to={`/events/${event._id}`}
                     className="flex-1 bg-purple-600 text-white text-center py-2 px-4 rounded hover:bg-purple-700 transition-colors"
                   >
                     View Details
                   </Link>
                   <button
-                    onClick={() => handleBookNow('title' in event ? event.title : 'Event')}
+                    onClick={() => handleBookNow(event)}
                     className="flex-1 border border-purple-600 text-purple-600 text-center py-2 px-4 rounded hover:bg-purple-50 transition-colors"
                   >
                     Book Now
@@ -193,7 +139,8 @@ export default function EventsPage() {
       <BookingModal
         isOpen={isBookingModalOpen}
         onClose={() => setIsBookingModalOpen(false)}
-        eventName={selectedEventName}
+        eventName={selectedEvent?.title}
+        event={selectedEvent}
       />
     </div>
   );

@@ -48,6 +48,15 @@ export default function Navbar() {
           <div className="hidden md:flex justify-end items-center space-x-4 flex-1">
             {isAuthenticated ? (
               <>
+                <Link
+                  to="/my-bookings"
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive('/my-bookings')
+                    ? "text-purple-400 bg-white/10"
+                    : "text-white hover:text-purple-400 hover:bg-white/10"
+                    }`}
+                >
+                  My Bookings
+                </Link>
                 {user?.role === "admin" && (
                   <Link
                     to="/admin"
@@ -104,6 +113,16 @@ export default function Navbar() {
               ))}
               {isAuthenticated ? (
                 <>
+                  <Link
+                    to="/my-bookings"
+                    onClick={() => setIsOpen(false)}
+                    className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive('/my-bookings')
+                      ? "text-purple-600 bg-purple-50"
+                      : "text-gray-700 hover:text-purple-600 hover:bg-purple-50"
+                      }`}
+                  >
+                    My Bookings
+                  </Link>
                   {user?.role === "admin" && (
                     <Link
                       to="/admin"
@@ -113,6 +132,9 @@ export default function Navbar() {
                       Admin
                     </Link>
                   )}
+                  <div className="px-3 py-2">
+                    <SignOutButton />
+                  </div>
                 </>
               ) : (
                 <Link
@@ -127,6 +149,6 @@ export default function Navbar() {
           </div>
         )}
       </div>
-    </nav>
+    </nav >
   );
 }
