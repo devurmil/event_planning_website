@@ -73,6 +73,7 @@ export const localApi = {
     getTeam: "team:all",
     create: "events:create",
     remove: "events:delete",
+    update: "events:update",
   },
   bookings: {
     getAll: "bookings:all",
@@ -154,6 +155,17 @@ export const resolvers = {
       console.error("Failed to create event on server", error);
     }
     return insert("events", args);
+  },
+  "events:update": async (args: { id: string;[key: string]: any }) => {
+    const { id, ...updates } = args;
+    const response = await fetch(`${API_BASE_URL}/events/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updates),
+    });
+    const result = await response.json();
+    window.dispatchEvent(new CustomEvent("db-update"));
+    return result;
   },
   "events:delete": async (args: { id: string }) => {
     const response = await fetch(`${API_BASE_URL}/events/${args.id}`, {

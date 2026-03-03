@@ -1,11 +1,14 @@
+import { useState } from "react";
 import { useQuery } from "@/hooks/use-local-convex";
 import { localApi as api } from "@/lib/db";
 import { useAuth } from "@/lib/auth-context";
-import { Clock, Calendar, CheckCircle, XCircle } from "lucide-react";
+import { Clock, Calendar, CheckCircle, XCircle, Loader2, FileText } from "lucide-react";
+import BookingDetailModal from "@/components/BookingDetailModal";
 
 export default function MyBookingsPage() {
-    const { user } = useAuth();
-    const myBookings = useQuery<any[]>(api.bookings.getByUser, { email: user?.email }) || [];
+    const { user, isLoading } = useAuth();
+    const myBookings = useQuery<any[]>(api.bookings.getByUser, { email: user?.email || null }) || [];
+    const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
 
     const getStatusIcon = (status: string) => {
         switch (status) {
@@ -32,6 +35,34 @@ export default function MyBookingsPage() {
                 return "bg-yellow-100 text-yellow-800";
         }
     };
+
+    // Show loading spinner while auth is resolving
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-gray-50 pt-[6rem] flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4 text-purple-600">
+                    <Loader2 className="w-10 h-10 animate-spin" />
+                    <p className="text-gray-500 font-medium">Loading your bookings…</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Show prompt if not logged in
+    if (!user) {
+        return (
+            <div className="min-h-screen bg-gray-50 pt-[6rem] flex items-center justify-center">
+                <div className="bg-white rounded-xl shadow-md p-12 text-center max-w-md">
+                    <Calendar className="w-12 h-12 text-purple-400 mx-auto mb-4" />
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Sign In Required</h2>
+                    <p className="text-gray-600 mb-6">Please log in to view your bookings.</p>
+                    <a href="/login" className="inline-block bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors shadow-lg">
+                        Log In
+                    </a>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 pt-[6rem] pb-12">
@@ -100,9 +131,13 @@ export default function MyBookingsPage() {
                                         </div>
                                     )}
 
-                                    <div className="flex justify-end border-t border-gray-100 pt-6">
-                                        <button className="text-sm font-medium text-purple-600 hover:text-purple-700 transition-colors">
-                                            View Details & Receipt
+                                    <div className="flex justify-end border-t border-gray-100 pt-5">
+                                        <button
+                                            onClick={() => setSelectedBooking(booking)}
+                                            className="flex items-center gap-2 text-sm font-semibold text-purple-600 hover:text-white hover:bg-purple-600 border border-purple-200 hover:border-purple-600 px-4 py-2 rounded-lg transition-all duration-200"
+                                        >
+                                            <FileText className="w-4 h-4" />
+                                            View Details &amp; Receipt
                                         </button>
                                     </div>
                                 </div>
@@ -124,6 +159,14 @@ export default function MyBookingsPage() {
                     </div>
                 )}
             </div>
+
+            {/* Booking Detail Modal */}
+            {selectedBooking && (
+                <BookingDetailModal
+                    booking={selectedBooking}
+                    onClose={() => setSelectedBooking(null)}
+                />
+            )}
         </div>
     );
 }

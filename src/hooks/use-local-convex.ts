@@ -17,6 +17,8 @@ export function useQuery<T = any>(queryKey: any, args?: any) {
 
   const fetchData = useCallback(async () => {
     if (!key) return;
+    // Skip if any arg value is undefined (e.g. email not yet loaded from auth)
+    if (args && Object.values(args).some((v) => v === undefined || v === null)) return;
     const resolver = resolvers[key as keyof typeof resolvers];
     if (resolver) {
       try {

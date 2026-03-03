@@ -61,6 +61,11 @@ export default function BookingModal({ isOpen, onClose, eventName, initialPackag
     // ⚠️ All hooks must be above this early return
     if (!isOpen) return null;
 
+    // Minimum selectable date = tomorrow (YYYY-MM-DD)
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const minDate = tomorrow.toISOString().split('T')[0];
+
     const currentPrice = () => {
         if (formData.packageType === 'custom') {
             return Object.entries(formData.services).reduce((total, [service, selected]) => {
@@ -160,6 +165,7 @@ export default function BookingModal({ isOpen, onClose, eventName, initialPackag
                                     value={formData.eventDate}
                                     onChange={handleInputChange}
                                     required
+                                    min={minDate}
                                     className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-purple-500 focus:border-purple-500"
                                 />
                             </div>
