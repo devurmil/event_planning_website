@@ -4,6 +4,7 @@ import { useQuery } from "@/hooks/use-local-convex";
 import { localApi as api } from "@/lib/db";
 import { Event } from "@/lib/types";
 import BookingModal from "../components/BookingModal";
+import { ArrowRight, CheckCircle2, ArrowUpRight, MessageSquare } from "lucide-react";
 
 export default function EventsPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -30,28 +31,33 @@ export default function EventsPage() {
     ? allEvents
     : allEvents.filter((event: Event) => event.category === selectedCategory);
 
-  const displayEvents = filteredEvents;
-
   return (
-    <div className="min-h-screen bg-gray-50 pt-[5rem]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Events</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Discover our comprehensive range of event planning services tailored to make your special moments unforgettable
+    <div className="min-h-screen bg-[#0F0F1A]">
+      {/* ── Page Header ── */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="orb orb-purple w-[500px] h-[500px] top-[-200px] right-[-100px] opacity-20 animate-float-slow" />
+        <div className="orb orb-pink w-[300px] h-[300px] top-[50px] left-[-80px] opacity-15" />
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <span className="section-badge mb-6 inline-block">Browse & Book</span>
+          <h1 className="text-5xl md:text-7xl font-black text-white mb-6 leading-tight">
+            Our <span className="gradient-text">Events</span>
+          </h1>
+          <p className="text-xl text-white/50 max-w-2xl mx-auto leading-relaxed">
+            Discover our comprehensive range of event planning services tailored to make your special moments unforgettable.
           </p>
         </div>
+      </section>
 
-        {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        {/* ── Category Filter ── */}
+        <div className="flex flex-wrap justify-center gap-3 mb-14">
           {categories.map((category) => (
             <button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
-              className={`px-6 py-3 rounded-full font-medium transition-colors ${selectedCategory === category.id
-                ? "bg-purple-600 text-white"
-                : "bg-white text-gray-700 hover:bg-purple-50 border border-gray-200"
+              className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${selectedCategory === category.id
+                  ? "brand-gradient text-white shadow-glow"
+                  : "bg-white/[0.04] text-white/50 hover:text-white hover:bg-white/[0.08] border border-white/[0.06]"
                 }`}
             >
               {category.name}
@@ -59,51 +65,63 @@ export default function EventsPage() {
           ))}
         </div>
 
-        {/* Events Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {displayEvents.map((event: Event) => (
-            <div key={event._id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow flex flex-col">
-              <img
-                src={event.imageUrl}
-                alt={event.title}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full capitalize">
+        {/* ── Events Grid ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredEvents.map((event: Event) => (
+            <div
+              key={event._id}
+              className="group relative rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.14] overflow-hidden card-hover flex flex-col"
+            >
+              {/* Image */}
+              <div className="relative overflow-hidden aspect-[16/10]">
+                <img
+                  src={event.imageUrl}
+                  alt={event.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0F0F1A] via-[#0F0F1A]/30 to-transparent" />
+
+                {/* Category badge */}
+                <div className="absolute top-4 left-4">
+                  <span className="px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm bg-white/10 border border-white/10 text-white capitalize">
                     {event.category}
                   </span>
                 </div>
-                <h3 className="text-xl font-semibold mb-3">{event.title}</h3>
-                <p className="text-gray-600 mb-4 line-clamp-2">
+              </div>
+
+              {/* Content */}
+              <div className="flex flex-col flex-1 p-6">
+                <h3 className="text-lg font-bold text-white mb-2 group-hover:text-violet-300 transition-colors">
+                  {event.title}
+                </h3>
+                <p className="text-white/40 text-sm mb-5 line-clamp-2 leading-relaxed flex-1">
                   {event.shortDescription || event.description}
                 </p>
 
                 {/* Features */}
-                <div className="mb-4">
-                  <h4 className="font-medium text-gray-900 mb-2">Included:</h4>
-                  <ul className="text-sm text-gray-600 space-y-1">
+                <div className="mb-6">
+                  <p className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-3">Included</p>
+                  <ul className="space-y-1.5">
                     {event.features.slice(0, 3).map((feature: string, index: number) => (
-                      <li key={index} className="flex items-center">
-                        <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
+                      <li key={index} className="flex items-start gap-2 text-sm text-white/50">
+                        <CheckCircle2 className="w-4 h-4 text-violet-400 shrink-0 mt-0.5" />
                         {feature}
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className="flex gap-2 mt-auto">
+                {/* Actions */}
+                <div className="flex gap-3 mt-auto">
                   <Link
                     to={`/events/${event._id}`}
-                    className="flex-1 bg-purple-600 text-white text-center py-2 px-4 rounded hover:bg-purple-700 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-1.5 brand-gradient text-white text-sm font-semibold py-2.5 px-4 rounded-xl shadow-glow hover:shadow-glow-pink transition-all duration-200 hover:scale-[1.02]"
                   >
-                    View Details
+                    View Details <ArrowUpRight className="w-3.5 h-3.5" />
                   </Link>
                   <button
                     onClick={() => handleBookNow(event)}
-                    className="flex-1 border border-purple-600 text-purple-600 text-center py-2 px-4 rounded hover:bg-purple-50 transition-colors"
+                    className="flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold border border-white/10 text-white/70 hover:text-white hover:bg-white/5 transition-all duration-200"
                   >
                     Book Now
                   </button>
@@ -113,26 +131,35 @@ export default function EventsPage() {
           ))}
         </div>
 
-        {displayEvents.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No events found in this category.</p>
+        {/* Empty state */}
+        {filteredEvents.length === 0 && (
+          <div className="text-center py-24">
+            <div className="w-20 h-20 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mx-auto mb-5">
+              <span className="text-3xl">🎉</span>
+            </div>
+            <p className="text-white/30 text-lg">No events in this category yet.</p>
           </div>
         )}
 
-        {/* Call to Action */}
-        <div className="text-center mt-16 bg-white rounded-lg p-8 shadow-lg">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Don't See What You're Looking For?
-          </h2>
-          <p className="text-xl text-gray-600 mb-6">
-            We create custom events tailored to your specific needs and vision
-          </p>
-          <Link
-            to="/contact"
-            className="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors inline-block"
-          >
-            Contact Us for Custom Planning
-          </Link>
+        {/* ── CTA card ── */}
+        <div className="mt-20 relative overflow-hidden rounded-2xl p-10 text-center border border-white/[0.06]">
+          <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 via-transparent to-pink-600/10" />
+          <div className="orb orb-purple w-[300px] h-[300px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10" />
+          <div className="relative z-10">
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
+              Don't See What You're Looking For?
+            </h2>
+            <p className="text-white/40 text-lg mb-8 max-w-lg mx-auto">
+              We create fully custom events tailored to your specific needs and vision.
+            </p>
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 px-8 py-4 brand-gradient text-white rounded-xl font-bold shadow-glow hover:shadow-glow-pink transition-all duration-300 hover:scale-105"
+            >
+              <MessageSquare className="w-5 h-5" />
+              Contact Us for Custom Planning
+            </Link>
+          </div>
         </div>
       </div>
 

@@ -1,11 +1,12 @@
 import { useQuery } from "@/hooks/use-local-convex";
 import { localApi as api } from "@/lib/db";
 import { Service } from "@/lib/types";
+import { CheckCircle2, ArrowRight, Zap, Clock, Heart } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function ServicesPage() {
   const services = useQuery<Service[]>(api.events.getServices) || [];
 
-  // Example services data
   const exampleServices = [
     {
       id: 1,
@@ -95,40 +96,69 @@ export default function ServicesPage() {
 
   const displayServices = services.length > 0 ? services : exampleServices;
 
+  const processSteps = [
+    { step: "01", title: "Consultation", description: "We start with a detailed consultation to understand your vision, requirements, and budget." },
+    { step: "02", title: "Planning", description: "Our team creates a comprehensive plan with timelines, vendor coordination, and logistics." },
+    { step: "03", title: "Coordination", description: "We manage all vendors, handle logistics, and ensure everything is perfectly coordinated." },
+    { step: "04", title: "Execution", description: "On event day, we oversee every detail to ensure flawless execution of your celebration." },
+  ];
+
+  const reasons = [
+    { Icon: Zap, title: "Expert Team", desc: "Our experienced professionals bring creativity and expertise to every project.", color: "from-violet-500 to-purple-600" },
+    { Icon: Clock, title: "Timely Execution", desc: "We pride ourselves on delivering events on time and within budget.", color: "from-pink-500 to-rose-600" },
+    { Icon: Heart, title: "Personalized Service", desc: "Every event is customized to reflect your unique style and preferences.", color: "from-blue-500 to-indigo-600" },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-purple-600 to-pink-600 pt-[7rem] text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold mb-6">Our Services</h1>
-          <p className="text-xl max-w-3xl mx-auto">
-            From initial planning to final execution, we provide comprehensive event services 
+    <div className="min-h-screen bg-[#0F0F1A]">
+      {/* ── Hero ── */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="orb orb-purple w-[500px] h-[500px] top-[-150px] right-[-100px] opacity-20 animate-float-slow" />
+        <div className="orb orb-pink w-[350px] h-[350px] top-[100px] left-[-80px] opacity-15" />
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <span className="section-badge mb-6 inline-block">Full-Service Planning</span>
+          <h1 className="text-5xl md:text-7xl font-black text-white mb-6 leading-tight">
+            Our <span className="gradient-text">Services</span>
+          </h1>
+          <p className="text-xl text-white/50 max-w-2xl mx-auto leading-relaxed">
+            From initial planning to final execution, we provide comprehensive event services
             to make your celebration perfect in every detail.
           </p>
         </div>
       </section>
 
-      {/* Services Grid */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* ── Services Grid ── */}
+      <section className="pb-24">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayServices.map((service) => (
-              <div key={'id' in service ? service.id : service._id} className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-shadow">
-                <div className="text-center mb-6">
-                  <div className="text-4xl mb-4">{service.icon}</div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">{service.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{service.description}</p>
+              <div
+                key={'id' in service ? service.id : service._id}
+                className="group relative rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.14] p-8 card-hover overflow-hidden"
+              >
+                {/* Glow on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-violet-600/0 to-pink-600/0 group-hover:from-violet-600/5 group-hover:to-pink-600/5 transition-all duration-500 pointer-events-none rounded-2xl" />
+
+                {/* Top line */}
+                <div className="absolute top-0 left-0 right-0 h-0.5 brand-gradient rounded-t-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-300" />
+
+                <div className="text-4xl mb-5 group-hover:scale-110 transition-transform duration-300 inline-block">
+                  {service.icon}
                 </div>
-                
-                <div className="border-t pt-6">
-                  <h4 className="font-semibold text-gray-900 mb-3">What's Included:</h4>
-                  <ul className="space-y-2">
+                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-violet-300 transition-colors">
+                  {service.title}
+                </h3>
+                <p className="text-white/40 text-sm leading-relaxed mb-6">
+                  {service.description}
+                </p>
+
+                <div className="border-t border-white/5 pt-6">
+                  <p className="text-xs font-semibold text-white/25 uppercase tracking-widest mb-4">What's Included</p>
+                  <ul className="space-y-2.5">
                     {service.features.map((feature, index) => (
-                      <li key={index} className="flex items-start">
-                        <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span className="text-gray-700 text-sm">{feature}</span>
+                      <li key={index} className="flex items-start gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 text-violet-400 shrink-0 mt-0.5" />
+                        <span className="text-white/50 text-sm leading-snug">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -139,112 +169,87 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* Process Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Process</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+      {/* ── Process ── */}
+      <section className="py-24 bg-[#0A0A14]">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="section-badge mb-4 inline-block">How It Works</span>
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+              Our <span className="gradient-text">Process</span>
+            </h2>
+            <p className="text-white/40 max-w-xl mx-auto text-lg">
               We follow a proven process to ensure every event is executed flawlessly
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {[
-              {
-                step: "1",
-                title: "Consultation",
-                description: "We start with a detailed consultation to understand your vision, requirements, and budget."
-              },
-              {
-                step: "2", 
-                title: "Planning",
-                description: "Our team creates a comprehensive plan with timelines, vendor coordination, and logistics."
-              },
-              {
-                step: "3",
-                title: "Coordination",
-                description: "We manage all vendors, handle logistics, and ensure everything is perfectly coordinated."
-              },
-              {
-                step: "4",
-                title: "Execution",
-                description: "On event day, we oversee every detail to ensure flawless execution of your celebration."
-              }
-            ].map((process, index) => (
-              <div key={index} className="text-center">
-                <div className="bg-purple-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                  {process.step}
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+            {/* Connector line (desktop) */}
+            <div className="hidden md:block absolute top-10 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-violet-600/30 via-pink-500/30 to-violet-600/30" />
+
+            {processSteps.map((process, index) => (
+              <div key={index} className="relative text-center group">
+                <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-2xl brand-gradient shadow-glow mb-6 group-hover:scale-110 transition-transform duration-300 mx-auto">
+                  <span className="text-white font-black text-2xl">{process.step}</span>
                 </div>
-                <h3 className="text-xl font-semibold mb-3">{process.title}</h3>
-                <p className="text-gray-600">{process.description}</p>
+                <h3 className="text-lg font-bold text-white mb-3 group-hover:text-violet-300 transition-colors">
+                  {process.title}
+                </h3>
+                <p className="text-white/40 text-sm leading-relaxed">{process.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Why Choose Us */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose Our Services?</h2>
+      {/* ── Why Choose Us ── */}
+      <section className="py-24 bg-[#0F0F1A]">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="section-badge mb-4 inline-block">Why Us</span>
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+              Why Choose Our <span className="gradient-text">Services?</span>
+            </h2>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {reasons.map(({ Icon, title, desc, color }) => (
+              <div key={title} className="group text-center p-8 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] card-hover">
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
+                  <Icon className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-violet-300 transition-colors">{title}</h3>
+                <p className="text-white/40 leading-relaxed text-sm">{desc}</p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Expert Team</h3>
-              <p className="text-gray-600">Our experienced professionals bring creativity and expertise to every project</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Timely Execution</h3>
-              <p className="text-gray-600">We pride ourselves on delivering events on time and within budget</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Personalized Service</h3>
-              <p className="text-gray-600">Every event is customized to reflect your unique style and preferences</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-16 bg-purple-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-4">Ready to Start Planning?</h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
+      {/* ── CTA ── */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-violet-900/20 via-[#0F0F1A] to-pink-900/20" />
+        <div className="orb orb-purple w-[400px] h-[400px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-15" />
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+            Ready to <span className="gradient-text">Start Planning?</span>
+          </h2>
+          <p className="text-white/40 text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
             Let our expert team help you create an unforgettable event that exceeds your expectations
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="/contact"
-              className="bg-white text-purple-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors"
+            <Link
+              to="/contact"
+              className="group inline-flex items-center gap-2 px-8 py-4 brand-gradient text-white rounded-xl font-bold shadow-glow hover:shadow-glow-pink transition-all duration-300 hover:scale-105"
             >
               Get Started Today
-            </a>
-            <a
-              href="/events"
-              className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-purple-600 transition-colors"
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              to="/events"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-white border border-white/10 hover:bg-white/5 transition-all"
             >
               View Our Events
-            </a>
+            </Link>
           </div>
         </div>
       </section>
