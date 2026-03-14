@@ -143,7 +143,7 @@ app.get("/api/events", async (req, res) => {
 });
 
 app.post("/api/events", async (req, res) => {
-  const { title, category, imageUrl, description, shortDescription, features, pricing, gallery, timeline } = req.body;
+  const { title, category, imageUrl, description, shortDescription, features, pricing, gallery, timeline, isFeatured } = req.body;
 
   try {
     const newEvent = new Event({
@@ -156,6 +156,7 @@ app.post("/api/events", async (req, res) => {
       pricing,
       gallery,
       timeline,
+      isFeatured,
     });
 
     await newEvent.save();

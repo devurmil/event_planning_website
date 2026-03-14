@@ -93,12 +93,15 @@ export const resolvers = {
       const response = await fetch(`${API_BASE_URL}/events`);
       if (response.ok) {
         const events = await response.json();
-        return events.filter((e: any) => e.isFeatured);
+        const featured = events.filter((e: any) => e.isFeatured);
+        return featured.length > 0 ? featured : events.slice(0, 3);
       }
     } catch (error) {
       console.error("Failed to fetch featured events from server, falling back to local", error);
     }
-    return query("events", (e) => e.isFeatured);
+    const localEvents = query("events");
+    const featuredLocal = localEvents.filter((e: any) => e.isFeatured);
+    return featuredLocal.length > 0 ? featuredLocal : localEvents.slice(0, 3);
   },
   "testimonials:all": () => query("testimonials"),
   "events:all": async () => {

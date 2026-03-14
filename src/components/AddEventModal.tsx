@@ -20,6 +20,7 @@ const EMPTY_FORM = {
     basicPrice: "",
     premiumPrice: "",
     luxuryPrice: "",
+    isFeatured: false,
 };
 
 export default function AddEventModal({ isOpen, onClose, eventToEdit }: AddEventModalProps) {
@@ -44,6 +45,7 @@ export default function AddEventModal({ isOpen, onClose, eventToEdit }: AddEvent
                 basicPrice: String(eventToEdit.pricing?.basic ?? ""),
                 premiumPrice: String(eventToEdit.pricing?.premium ?? ""),
                 luxuryPrice: String(eventToEdit.pricing?.luxury ?? ""),
+                isFeatured: eventToEdit.isFeatured || false,
             });
         } else {
             setFormData(EMPTY_FORM);
@@ -74,6 +76,7 @@ export default function AddEventModal({ isOpen, onClose, eventToEdit }: AddEvent
                     luxury: Number(formData.luxuryPrice) || 0,
                 },
                 gallery: [formData.imageUrl],
+                isFeatured: formData.isFeatured,
             };
 
             if (isEditMode && eventToEdit) {
@@ -110,7 +113,7 @@ export default function AddEventModal({ isOpen, onClose, eventToEdit }: AddEvent
                     required={opts.required}
                     rows={opts.rows}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none resize-none"
-                    value={formData[key]}
+                    value={String(formData[key as keyof typeof EMPTY_FORM] || "")}
                     onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
                     placeholder={opts.placeholder}
                 />
@@ -119,7 +122,7 @@ export default function AddEventModal({ isOpen, onClose, eventToEdit }: AddEvent
                     type={opts.type || "text"}
                     required={opts.required}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
-                    value={formData[key]}
+                    value={String(formData[key as keyof typeof EMPTY_FORM] || "")}
                     onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
                     placeholder={opts.placeholder}
                 />
@@ -177,6 +180,19 @@ export default function AddEventModal({ isOpen, onClose, eventToEdit }: AddEvent
                         {field("Basic Price ($)", "basicPrice", { type: "number", placeholder: "2500" })}
                         {field("Premium Price ($)", "premiumPrice", { type: "number", placeholder: "4500" })}
                         {field("Luxury Price ($)", "luxuryPrice", { type: "number", placeholder: "7500" })}
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-2">
+                        <input
+                            type="checkbox"
+                            id="isFeatured"
+                            className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                            checked={formData.isFeatured}
+                            onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+                        />
+                        <label htmlFor="isFeatured" className="text-sm font-medium text-gray-700">
+                            Feature this event on home page
+                        </label>
                     </div>
 
                     <div className="pt-4 flex gap-4 border-t">
